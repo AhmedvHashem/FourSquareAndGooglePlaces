@@ -5,16 +5,16 @@ package com.ahmednts.coformatiqueassignment.data;
  */
 
 public class UnifiedPlaceDetails {
-    public String id;
-    public String name;
+    private String id;
+    private String name;
 
-    public double rating;
+    private double rating;
 
-    public String address;
-    public String phone_number;
+    private String address;
+    private String phone_number;
 
-    public double lat;
-    public double lng;
+    private double lat;
+    private double lng;
 
     public UnifiedPlaceDetails(String id, String name, double rating, String address, String phone_number, double lat, double lng) {
         this.id = id;
@@ -24,5 +24,33 @@ public class UnifiedPlaceDetails {
         this.phone_number = phone_number;
         this.lat = lat;
         this.lng = lng;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getPhone_number() {
+        return phone_number;
+    }
+
+    public double getLat() {
+        return lat;
+    }
+
+    public double getLng() {
+        return lng;
     }
 }

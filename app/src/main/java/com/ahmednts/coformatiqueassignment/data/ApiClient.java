@@ -11,8 +11,6 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -84,22 +82,20 @@ public class ApiClient {
                         "20161106",
                         "30.2446784,31.359881",
                         "5000",
-                        "food").map(new Function<FoursquareNearbyResponse, List<UnifiedPlaceDetails>>() {
-                    @Override
-                    public List<UnifiedPlaceDetails> apply(@NonNull FoursquareNearbyResponse foursquareNearbyResponse) throws Exception {
-                        List<UnifiedPlaceDetails> unifiedPlaceDetailsList = new ArrayList<>();
-                        for (FoursquareNearbyResponse.Group.Item foursquarePlaceDetails : foursquareNearbyResponse.response.groups.get(0).items) {
-                            Logger.withTag("FoursquareNearbyResponse").log(foursquarePlaceDetails.toString());
-                            unifiedPlaceDetailsList.add(new UnifiedPlaceDetails(foursquarePlaceDetails.venue.id
-                                    , foursquarePlaceDetails.venue.name
-                                    , foursquarePlaceDetails.venue.rating
-                                    , "No address"
-                                    , foursquarePlaceDetails.venue.contact.formattedPhone
-                                    , foursquarePlaceDetails.venue.location.lat
-                                    , foursquarePlaceDetails.venue.location.lng));
-                        }
-                        return unifiedPlaceDetailsList;
+                        "food")
+                .map(foursquareNearbyResponse -> {
+                    List<UnifiedPlaceDetails> unifiedPlaceDetailsList = new ArrayList<>();
+                    for (FoursquareNearbyResponse.Group.Item foursquarePlaceDetails : foursquareNearbyResponse.response.groups.get(0).items) {
+                        Logger.withTag("FoursquareNearbyResponse").log(foursquarePlaceDetails.toString());
+                        unifiedPlaceDetailsList.add(new UnifiedPlaceDetails(foursquarePlaceDetails.venue.id
+                                , foursquarePlaceDetails.venue.name
+                                , foursquarePlaceDetails.venue.rating
+                                , "No address"
+                                , foursquarePlaceDetails.venue.contact.formattedPhone
+                                , foursquarePlaceDetails.venue.location.lat
+                                , foursquarePlaceDetails.venue.location.lng));
                     }
+                    return unifiedPlaceDetailsList;
                 });
 
         return Observable.merge(googleNearbyResponseObservable, foursquareNearbyResponseObservable)

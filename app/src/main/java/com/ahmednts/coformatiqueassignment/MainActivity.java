@@ -37,6 +37,6 @@ public class MainActivity extends AppCompatActivity {
 //            Logger.withTag("MainActivity").log(googleNearbyResponse.toString());
 //        });
 
-        ApiClient.getInstance().getNearbyPlaces().subscribe(unifiedPlaceDetails -> {});
+
     }
 }

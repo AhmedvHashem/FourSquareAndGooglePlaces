@@ -20,7 +20,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".nearbyplaces.NearbyPlacesActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -39,9 +39,9 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_api_key" />
 
-        <activity
-            android:name=".nearbyplaces.NearbyPlacesActivity"
-            android:label="@string/title_activity_nearby_places" />
+        <!--<activity-->
+            <!--android:name=".nearbyplaces.NearbyPlacesActivity"-->
+            <!--android:label="@string/title_activity_nearby_places" />-->
     </application>
 
 </manifest>
