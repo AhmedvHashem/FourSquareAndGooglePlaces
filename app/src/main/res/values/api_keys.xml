@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Package name:-->
+    <!--96:08:44:7E:8A:4D:14:F2:E2:93:93:5F:8E:53:B7:FB:EA:94:48:17-->
+    <!--SHA-1 certificate fingerprint:-->
+    <!--96:08:44:7E:8A:4D:14:F2:E2:93:93:5F:8E:53:B7:FB:EA:94:48:17-->
+    <string name="google_api_key" templateMergeStrategy="preserve" translatable="false">AIzaSyAaIDngtsYw3CH0NhCyFmQ3WuudRCQDqOk</string>
+
+    <string name="foursquare_client_id">AMBTQC02WPIV3LT3T3LKCBO2MJAR3UKVVRKXWOJSJHGOCRMW</string>
+    <string name="foursquare_client_secret">BGDQMV2JH3ES0RNIT4IYJVINZZXHFOK24VZ3QKJNKEKD4CN1</string>
+</resources>
