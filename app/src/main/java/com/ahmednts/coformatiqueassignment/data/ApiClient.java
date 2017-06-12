@@ -23,7 +23,8 @@ public class ApiClient {
 
     private static ApiClient INSTANCE;
 
-    private ApiServices googleApiServices, foursquareApiServices;
+    private GoogleAPI googleGoogleAPI;
+    private FoursquareAPI foursquareAPI;
 
     public static ApiClient getInstance() {
         if (INSTANCE == null)
@@ -43,7 +44,7 @@ public class ApiClient {
                 .baseUrl(GOOGLE_PLACES_BASE_URL)
                 .build();
 
-        googleApiServices = retrofit.create(ApiServices.class);
+        googleGoogleAPI = retrofit.create(GoogleAPI.class);
 
         retrofit = new Retrofit.Builder()
                 .client(okHttpClient)
@@ -52,12 +53,12 @@ public class ApiClient {
                 .baseUrl(FOURESQUARE_BASE_URL)
                 .build();
 
-        foursquareApiServices = retrofit.create(ApiServices.class);
+        foursquareAPI = retrofit.create(FoursquareAPI.class);
     }
 
     public Observable<List<UnifiedPlaceDetails>> getNearbyPlaces(String location) {
 
-        Observable<List<UnifiedPlaceDetails>> googleNearbyResponseObservable = googleApiServices
+        Observable<List<UnifiedPlaceDetails>> googleNearbyResponseObservable = googleGoogleAPI
                 .googleNearby(App.getInstance().getString(R.string.google_api_key),
                         location,
                         "5000",
@@ -66,7 +67,7 @@ public class ApiClient {
                     List<UnifiedPlaceDetails> unifiedPlaceDetailsList = new ArrayList<>();
                     for (GooglePlaceDetails googlePlaceDetails : googleNearbyResponse.results) {
                         Logger.withTag("GooglePlaceDetails").log(googlePlaceDetails.toString());
-                        unifiedPlaceDetailsList.add(new UnifiedPlaceDetails(UnifiedPlaceDetails.ApiType.GOOGLE,
+                        unifiedPlaceDetailsList.add(new UnifiedPlaceDetails(UnifiedPlaceDetails.TYPE_GOOGLE,
                                 googlePlaceDetails.place_id
                                 , googlePlaceDetails.name
                                 , googlePlaceDetails.rating
@@ -79,7 +80,7 @@ public class ApiClient {
                     return unifiedPlaceDetailsList;
                 });
 
-        Observable<List<UnifiedPlaceDetails>> foursquareNearbyResponseObservable = foursquareApiServices
+        Observable<List<UnifiedPlaceDetails>> foursquareNearbyResponseObservable = foursquareAPI
                 .fouresquareNearby(App.getInstance().getString(R.string.foursquare_client_id), App.getInstance().getString(R.string.foursquare_client_secret),
                         "20161106",
                         location,
@@ -90,7 +91,7 @@ public class ApiClient {
                     for (FoursquareNearbyResponse.Group.Item foursquarePlaceDetails : foursquareNearbyResponse.response.groups.get(0).items) {
                         Logger.withTag("FoursquareNearbyResponse").log(foursquarePlaceDetails.toString());
                         unifiedPlaceDetailsList.add(new UnifiedPlaceDetails(
-                                UnifiedPlaceDetails.ApiType.FOURESQUARE,
+                                UnifiedPlaceDetails.TYPE_FOURESQUARE,
                                 foursquarePlaceDetails.venue.id
                                 , foursquarePlaceDetails.venue.name
                                 , foursquarePlaceDetails.venue.rating
@@ -109,12 +110,12 @@ public class ApiClient {
     }
 
     public Observable<UnifiedPlaceDetails> getGooglePlaceDetails(String id) {
-        return googleApiServices.googlePlaceDetails(App.getInstance().getString(R.string.google_api_key), id)
+        return googleGoogleAPI.googlePlaceDetails(App.getInstance().getString(R.string.google_api_key), id)
                 .map(placeDetailsResponse -> {
                     Logger.withTag("GooglePlaceDetails").log(placeDetailsResponse.toString());
 
                     return new UnifiedPlaceDetails(
-                            UnifiedPlaceDetails.ApiType.GOOGLE,
+                            UnifiedPlaceDetails.TYPE_GOOGLE,
                             placeDetailsResponse.result.place_id
                             , placeDetailsResponse.result.name
                             , placeDetailsResponse.result.rating
@@ -131,15 +132,13 @@ public class ApiClient {
     }
 
     public Observable<UnifiedPlaceDetails> getFourSquarePlaceDetails(String id) {
-        return foursquareApiServices
-                .fouresquarePlaceDetails(App.getInstance().getString(R.string.foursquare_client_id), App.getInstance().getString(R.string.foursquare_client_secret)
-                        , id
-                        , "20161106")
+        return foursquareAPI
+                .fouresquarePlaceDetails(id, App.getInstance().getString(R.string.foursquare_client_id), App.getInstance().getString(R.string.foursquare_client_secret), "20161106")
                 .map(placeDetailsResponse -> {
                     Logger.withTag("FourSquarePlaceDetails").log(placeDetailsResponse.toString());
 
                     return new UnifiedPlaceDetails(
-                            UnifiedPlaceDetails.ApiType.FOURESQUARE,
+                            UnifiedPlaceDetails.TYPE_FOURESQUARE,
                             placeDetailsResponse.response.venue.id
                             , placeDetailsResponse.response.venue.name
                             , placeDetailsResponse.response.venue.rating

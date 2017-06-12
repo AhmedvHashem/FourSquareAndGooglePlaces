@@ -19,7 +19,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -42,6 +41,7 @@
         <activity
             android:name=".nearbyplaces.NearbyPlacesActivity"
             android:label="@string/title_activity_nearby_places" />
+        <activity android:name=".placedetails.PlaceDetailsActivity"></activity>
     </application>
 
 </manifest>

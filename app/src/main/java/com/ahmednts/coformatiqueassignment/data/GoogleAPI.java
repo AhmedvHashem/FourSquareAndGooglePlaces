@@ -13,7 +13,7 @@ import retrofit2.http.Query;
 /**
  * Created by AhmedNTS on 6/1/2017.
  */
-public interface ApiServices {
+public interface GoogleAPI {
 
     //types=restaurant
     @GET("nearbysearch/json")
@@ -25,19 +25,4 @@ public interface ApiServices {
     @GET("details/json")
     Observable<GooglePlaceDetailsResponse> googlePlaceDetails(@Query("key") String apiKey,
                                                               @Query("placeid") String placeId);
-
-    //section=food
-    @GET("venues/explore")
-    Observable<FoursquareNearbyResponse> fouresquareNearby(@Query("client_id") String client_id,
-                                                           @Query("client_secret") String client_secret,
-                                                           @Query("v") String currentDate/*YYYYMMDD*/,
-                                                           @Query("ll") String location,
-                                                           @Query("radius") String radius,
-                                                           @Query("section") String section);
-
-    @GET("venues/{placeid}")
-    Observable<FoursquarePlaceDetailsResponse> fouresquarePlaceDetails(@Path("placeid") String placeId,
-                                                                       @Query("client_id") String client_id,
-                                                                       @Query("client_secret") String client_secret,
-                                                                       @Query("v") String currentDate/*YYYYMMDD*/);
 }

@@ -3,7 +3,6 @@ package com.ahmednts.coformatiqueassignment.nearbyplaces;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -16,10 +15,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.ahmednts.coformatiqueassignment.R;
-import com.ahmednts.coformatiqueassignment.data.ApiClient;
 import com.ahmednts.coformatiqueassignment.data.UnifiedPlaceDetails;
-import com.ahmednts.coformatiqueassignment.utils.Logger;
-import com.ahmednts.coformatiqueassignment.utils.UIUtils;
+import com.ahmednts.coformatiqueassignment.placedetails.PlaceDetailsActivity;
+import com.ahmednts.coformatiqueassignment.utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -74,7 +72,7 @@ public class NearbyPlacesActivity extends AppCompatActivity implements NearbyPla
 
     void initUI() {
 
-        UIUtils.setProgressBarColor(this, progressBar, R.color.colorAccent);
+        Utils.setProgressBarColor(this, progressBar, R.color.colorAccent);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         listView.setHasFixedSize(true);
@@ -84,7 +82,7 @@ public class NearbyPlacesActivity extends AppCompatActivity implements NearbyPla
     }
 
     PlacesAdapter.ItemClickListener itemClickListener = unifiedPlaceDetails -> {
-
+        nearbyPlacesPresenter.openPlaceDetails(unifiedPlaceDetails);
     };
 
     @Override
@@ -127,16 +125,7 @@ public class NearbyPlacesActivity extends AppCompatActivity implements NearbyPla
 
     @Override
     public void openDetailsUI(UnifiedPlaceDetails unifiedPlaceDetails) {
-
-        if (unifiedPlaceDetails.getApiType() == UnifiedPlaceDetails.ApiType.GOOGLE)
-            ApiClient.getInstance().getGooglePlaceDetails(unifiedPlaceDetails.getId()).subscribe(unifiedPlaceDetails1 -> {
-                Logger.withTag("Google UnifiedPlaceDetails1").log(unifiedPlaceDetails1.toString());
-            });
-        else {
-            ApiClient.getInstance().getFourSquarePlaceDetails(unifiedPlaceDetails.getId()).subscribe(unifiedPlaceDetails1 -> {
-                Logger.withTag("Foursquare UnifiedPlaceDetails1").log(unifiedPlaceDetails1.toString());
-            });
-        }
+        PlaceDetailsActivity.open(this, unifiedPlaceDetails.getApiType(), unifiedPlaceDetails.getId());
     }
 
     @Override
@@ -205,6 +194,6 @@ public class NearbyPlacesActivity extends AppCompatActivity implements NearbyPla
     @Override
     public void onInfoWindowClick(Marker marker) {
         UnifiedPlaceDetails unifiedPlaceDetails = (UnifiedPlaceDetails) marker.getTag();
-
+        nearbyPlacesPresenter.openPlaceDetails(unifiedPlaceDetails);
     }
 }

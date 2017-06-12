@@ -6,7 +6,10 @@ package com.ahmednts.coformatiqueassignment.data;
 
 public class UnifiedPlaceDetails {
 
-    private ApiType apiType;
+    public static int TYPE_GOOGLE = 1;
+    public static int TYPE_FOURESQUARE = 2;
+
+    private int apiType;
 
     private String id;
     private String name;
@@ -21,12 +24,7 @@ public class UnifiedPlaceDetails {
 
     private String category;
 
-    public static enum ApiType {
-        GOOGLE,
-        FOURESQUARE
-    }
-
-    public UnifiedPlaceDetails(ApiType apiType, String id, String name, double rating, String address, String phone_number, double lat, double lng, String category) {
+    public UnifiedPlaceDetails(int apiType, String id, String name, double rating, String address, String phone_number, double lat, double lng, String category) {
         this.apiType = apiType;
         this.id = id;
         this.name = name;
@@ -38,7 +36,7 @@ public class UnifiedPlaceDetails {
         this.category = category;
     }
 
-    public ApiType getApiType() {
+    public int getApiType() {
         return apiType;
     }
 

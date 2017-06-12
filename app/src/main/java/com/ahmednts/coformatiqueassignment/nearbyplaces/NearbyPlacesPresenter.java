@@ -79,6 +79,7 @@ public class NearbyPlacesPresenter implements NearbyPlacesContract.Presenter {
 
     @Override
     public void stop() {
-        getNearbyPlacesObserver.dispose();
+        if (getNearbyPlacesObserver != null)
+            getNearbyPlacesObserver.dispose();
     }
 }
