@@ -5,6 +5,7 @@ import com.ahmednts.coformatiqueassignment.R;
 import com.ahmednts.coformatiqueassignment.data.fouresquare.FoursquareNearbyResponse;
 import com.ahmednts.coformatiqueassignment.data.google.GooglePlaceDetails;
 import com.ahmednts.coformatiqueassignment.utils.Logger;
+import com.facebook.stetho.okhttp3.StethoInterceptor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,7 @@ public class ApiClient {
     private ApiClient() {
         OkHttpClient okHttpClient = new OkHttpClient
                 .Builder()
+                .addNetworkInterceptor(new StethoInterceptor())
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder()

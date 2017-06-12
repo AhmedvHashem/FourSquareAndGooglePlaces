@@ -115,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
 
                     Intent intent = new Intent(getMyContext(), NearbyPlacesActivity.class);
                     startActivity(intent);
+                    finish();
                 }
             });
 
