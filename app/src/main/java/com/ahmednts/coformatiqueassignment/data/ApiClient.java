@@ -18,12 +18,12 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
-    public static String GOOGLE_PLACES_BASE_URL = "https://maps.googleapis.com/maps/api/place/";
-    public static String FOURESQUARE_BASE_URL = "https://api.foursquare.com/v2/";
+    private static String GOOGLE_PLACES_BASE_URL = "https://maps.googleapis.com/maps/api/place/";
+    private static String FOURESQUARE_BASE_URL = "https://api.foursquare.com/v2/";
 
     private static ApiClient INSTANCE;
 
-    public ApiServices googleApiServices, foursquareApiServices;
+    private ApiServices googleApiServices, foursquareApiServices;
 
     public static ApiClient getInstance() {
         if (INSTANCE == null)
@@ -55,24 +55,26 @@ public class ApiClient {
         foursquareApiServices = retrofit.create(ApiServices.class);
     }
 
-    public Observable<List<UnifiedPlaceDetails>> getNearbyPlaces() {
+    public Observable<List<UnifiedPlaceDetails>> getNearbyPlaces(String location) {
 
         Observable<List<UnifiedPlaceDetails>> googleNearbyResponseObservable = googleApiServices
                 .googleNearby(App.getInstance().getString(R.string.google_api_key),
-                        "30.2446784,31.359881",
+                        location,
                         "5000",
                         "restaurant")
                 .map(googleNearbyResponse -> {
                     List<UnifiedPlaceDetails> unifiedPlaceDetailsList = new ArrayList<>();
                     for (GooglePlaceDetails googlePlaceDetails : googleNearbyResponse.results) {
                         Logger.withTag("GooglePlaceDetails").log(googlePlaceDetails.toString());
-                        unifiedPlaceDetailsList.add(new UnifiedPlaceDetails(googlePlaceDetails.place_id
+                        unifiedPlaceDetailsList.add(new UnifiedPlaceDetails(UnifiedPlaceDetails.ApiType.GOOGLE,
+                                googlePlaceDetails.place_id
                                 , googlePlaceDetails.name
                                 , googlePlaceDetails.rating
                                 , googlePlaceDetails.formatted_address
                                 , googlePlaceDetails.formatted_phone_number
                                 , googlePlaceDetails.geometry.location.lat
-                                , googlePlaceDetails.geometry.location.lng));
+                                , googlePlaceDetails.geometry.location.lng
+                                , (googlePlaceDetails.types == null || googlePlaceDetails.types.length == 0) ? "Restaurant" : googlePlaceDetails.types[0]));
                     }
                     return unifiedPlaceDetailsList;
                 });
@@ -80,20 +82,23 @@ public class ApiClient {
         Observable<List<UnifiedPlaceDetails>> foursquareNearbyResponseObservable = foursquareApiServices
                 .fouresquareNearby(App.getInstance().getString(R.string.foursquare_client_id), App.getInstance().getString(R.string.foursquare_client_secret),
                         "20161106",
-                        "30.2446784,31.359881",
+                        location,
                         "5000",
                         "food")
                 .map(foursquareNearbyResponse -> {
                     List<UnifiedPlaceDetails> unifiedPlaceDetailsList = new ArrayList<>();
                     for (FoursquareNearbyResponse.Group.Item foursquarePlaceDetails : foursquareNearbyResponse.response.groups.get(0).items) {
                         Logger.withTag("FoursquareNearbyResponse").log(foursquarePlaceDetails.toString());
-                        unifiedPlaceDetailsList.add(new UnifiedPlaceDetails(foursquarePlaceDetails.venue.id
+                        unifiedPlaceDetailsList.add(new UnifiedPlaceDetails(
+                                UnifiedPlaceDetails.ApiType.FOURESQUARE,
+                                foursquarePlaceDetails.venue.id
                                 , foursquarePlaceDetails.venue.name
                                 , foursquarePlaceDetails.venue.rating
                                 , "No address"
                                 , foursquarePlaceDetails.venue.contact.formattedPhone
                                 , foursquarePlaceDetails.venue.location.lat
-                                , foursquarePlaceDetails.venue.location.lng));
+                                , foursquarePlaceDetails.venue.location.lng
+                                , (foursquarePlaceDetails.venue.categories == null || foursquarePlaceDetails.venue.categories.length == 0) ? "Restaurant" : foursquarePlaceDetails.venue.categories[0].name));
                     }
                     return unifiedPlaceDetailsList;
                 });
@@ -103,35 +108,50 @@ public class ApiClient {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-//    public Observable<UnifiedPlaceDetails> getNearbyPlaces() {
-//        return googleApiServices
-//                .googleNearby(App.getInstance().getString(R.string.google_api_key),
-//                        "30.2446784,31.359881",
-//                        "5000",
-//                        "restaurant")
-//                .flatMap(new Function<GoogleNearbyResponse, ObservableSource<? extends FoursquareNearbyResponse>>() {
-//                    @Override
-//                    public ObservableSource<? extends FoursquareNearbyResponse> apply(@NonNull GoogleNearbyResponse googleNearbyResponse) throws Exception {
-//                        return foursquareApiServices.fouresquareNearby(App.getInstance().getString(R.string.foursquare_client_id),
-//                                App.getInstance().getString(R.string.foursquare_client_secret),
-//                                "20161106",
-//                                "30.2446784,31.359881",
-//                                "5000",
-//                                "food");
-//                    }
-//                }, new BiFunction<GoogleNearbyResponse, FoursquareNearbyResponse, UnifiedPlaceDetails>() {
-//                    @Override
-//                    public UnifiedPlaceDetails apply(@NonNull GoogleNearbyResponse googleNearbyResponse, @NonNull FoursquareNearbyResponse foursquareNearbyResponse) throws Exception {
-//                        return null;
-//                    }
-//                });
-//    }
+    public Observable<UnifiedPlaceDetails> getGooglePlaceDetails(String id) {
+        return googleApiServices.googlePlaceDetails(App.getInstance().getString(R.string.google_api_key), id)
+                .map(placeDetailsResponse -> {
+                    Logger.withTag("GooglePlaceDetails").log(placeDetailsResponse.toString());
 
-//
-//    public Observable<Movie> getMovieDetails(int movieId) {
-//        return apiServices
-//                .movieDetails(movieId, App.API_KEY)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread());
-//    }
+                    return new UnifiedPlaceDetails(
+                            UnifiedPlaceDetails.ApiType.GOOGLE,
+                            placeDetailsResponse.result.place_id
+                            , placeDetailsResponse.result.name
+                            , placeDetailsResponse.result.rating
+                            , placeDetailsResponse.result.formatted_address
+                            , placeDetailsResponse.result.formatted_phone_number
+                            , placeDetailsResponse.result.geometry.location.lat
+                            , placeDetailsResponse.result.geometry.location.lng
+                            , (placeDetailsResponse.result.types == null || placeDetailsResponse.result.types.length == 0)
+                            ? "Restaurant"
+                            : placeDetailsResponse.result.types[0]);
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Observable<UnifiedPlaceDetails> getFourSquarePlaceDetails(String id) {
+        return foursquareApiServices
+                .fouresquarePlaceDetails(App.getInstance().getString(R.string.foursquare_client_id), App.getInstance().getString(R.string.foursquare_client_secret)
+                        , id
+                        , "20161106")
+                .map(placeDetailsResponse -> {
+                    Logger.withTag("FourSquarePlaceDetails").log(placeDetailsResponse.toString());
+
+                    return new UnifiedPlaceDetails(
+                            UnifiedPlaceDetails.ApiType.FOURESQUARE,
+                            placeDetailsResponse.response.venue.id
+                            , placeDetailsResponse.response.venue.name
+                            , placeDetailsResponse.response.venue.rating
+                            , "No address"
+                            , placeDetailsResponse.response.venue.contact.formattedPhone
+                            , placeDetailsResponse.response.venue.location.lat
+                            , placeDetailsResponse.response.venue.location.lng
+                            , (placeDetailsResponse.response.venue.categories == null || placeDetailsResponse.response.venue.categories.length == 0)
+                            ? "Restaurant"
+                            : placeDetailsResponse.response.venue.categories[0].name);
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
 }

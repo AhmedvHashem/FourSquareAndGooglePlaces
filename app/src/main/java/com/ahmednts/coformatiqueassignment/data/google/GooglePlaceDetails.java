@@ -1,5 +1,7 @@
 package com.ahmednts.coformatiqueassignment.data.google;
 
+import java.util.Arrays;
+
 /**
  * Created by AhmedNTS on 6/11/2017.
  */
@@ -15,6 +17,8 @@ public class GooglePlaceDetails {
 
     public String formatted_address;
     public String formatted_phone_number;
+
+    public String[] types;
 
     public static class Geometry {
         public Location location;
@@ -43,12 +47,13 @@ public class GooglePlaceDetails {
     @Override
     public String toString() {
         return "GooglePlaceDetails{" +
-                "place_id=" + place_id +
+                "place_id='" + place_id + '\'' +
                 ", name='" + name + '\'' +
                 ", rating=" + rating +
                 ", geometry=" + geometry +
                 ", formatted_address='" + formatted_address + '\'' +
                 ", formatted_phone_number='" + formatted_phone_number + '\'' +
+                ", types=" + Arrays.toString(types) +
                 '}';
     }
 }

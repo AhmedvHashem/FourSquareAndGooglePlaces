@@ -1,5 +1,7 @@
 package com.ahmednts.coformatiqueassignment.data.fouresquare;
 
+import java.util.Arrays;
+
 /**
  * Created by AhmedNTS on 6/11/2017.
  */
@@ -14,6 +16,8 @@ public class FoursquarePlaceDetails {
     public Location location;
 
     public Contact contact;
+
+    public Category[] categories;
 
     public static class Location {
         public double lat;
@@ -39,6 +43,18 @@ public class FoursquarePlaceDetails {
         }
     }
 
+    public static class Category{
+        public String id;
+        public String name;
+
+        @Override
+        public String toString() {
+            return "Category{" +
+                    "name='" + name + '\'' +
+                    '}';
+        }
+    }
+
     @Override
     public String toString() {
         return "FoursquarePlaceDetails{" +
@@ -47,6 +63,7 @@ public class FoursquarePlaceDetails {
                 ", rating=" + rating +
                 ", location=" + location +
                 ", contact=" + contact +
+                ", categories=" + Arrays.toString(categories) +
                 '}';
     }
 }

@@ -16,7 +16,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.ahmednts.coformatiqueassignment.R;
+import com.ahmednts.coformatiqueassignment.data.ApiClient;
 import com.ahmednts.coformatiqueassignment.data.UnifiedPlaceDetails;
+import com.ahmednts.coformatiqueassignment.utils.Logger;
 import com.ahmednts.coformatiqueassignment.utils.UIUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -32,7 +34,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class NearbyPlacesActivity extends AppCompatActivity implements NearbyPlacesContract.View, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+public class NearbyPlacesActivity extends AppCompatActivity implements NearbyPlacesContract.View, OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnInfoWindowClickListener {
     public static final String EXTRA_LIST = "EXTRA_LIST";
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
@@ -118,13 +120,23 @@ public class NearbyPlacesActivity extends AppCompatActivity implements NearbyPla
 
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(unifiedPlaceDetailsList.get(0).getLat()
                     , unifiedPlaceDetailsList.get(0).getLng()), 12));
-            mMap.setOnMarkerClickListener(this);
+//            mMap.setOnMarkerClickListener(this);
+            mMap.setOnInfoWindowClickListener(this);
         }
     }
 
     @Override
     public void openDetailsUI(UnifiedPlaceDetails unifiedPlaceDetails) {
 
+        if (unifiedPlaceDetails.getApiType() == UnifiedPlaceDetails.ApiType.GOOGLE)
+            ApiClient.getInstance().getGooglePlaceDetails(unifiedPlaceDetails.getId()).subscribe(unifiedPlaceDetails1 -> {
+                Logger.withTag("Google UnifiedPlaceDetails1").log(unifiedPlaceDetails1.toString());
+            });
+        else {
+            ApiClient.getInstance().getFourSquarePlaceDetails(unifiedPlaceDetails.getId()).subscribe(unifiedPlaceDetails1 -> {
+                Logger.withTag("Foursquare UnifiedPlaceDetails1").log(unifiedPlaceDetails1.toString());
+            });
+        }
     }
 
     @Override
@@ -175,49 +187,24 @@ public class NearbyPlacesActivity extends AppCompatActivity implements NearbyPla
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        nearbyPlacesPresenter.mapViewReady();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
 
-        enableMyLocation();
+        mMap.setMyLocationEnabled(true);
+
+        nearbyPlacesPresenter.mapViewReady();
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        UnifiedPlaceDetails unifiedPlaceDetails = (UnifiedPlaceDetails) marker.getTag();
 
         return false;
-    }
-
-    /**
-     * Enables the My Location layer if the fine location permission has been granted.
-     */
-    private void enableMyLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // Permission to access the location is missing.
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
-        } else if (mMap != null) {
-            mMap.setMyLocationEnabled(true);
-        }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode != LOCATION_PERMISSION_REQUEST_CODE) {
-            return;
-        }
+    public void onInfoWindowClick(Marker marker) {
+        UnifiedPlaceDetails unifiedPlaceDetails = (UnifiedPlaceDetails) marker.getTag();
 
-        if (isPermissionGranted(permissions, grantResults, Manifest.permission.ACCESS_FINE_LOCATION)) {
-            // Enable the my location layer if the permission has been granted.
-            enableMyLocation();
-        }
     }
-
-    public static boolean isPermissionGranted(String[] grantPermissions, int[] grantResults, String permission) {
-        for (int i = 0; i < grantPermissions.length; i++) {
-            if (permission.equals(grantPermissions[i])) {
-                return grantResults[i] == PackageManager.PERMISSION_GRANTED;
-            }
-        }
-        return false;
-    }
-
 }

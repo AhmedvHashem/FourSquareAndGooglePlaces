@@ -53,6 +53,7 @@ dependencies {
     compile 'me.zhanghai.android.materialratingbar:library:1.0.2'
 
     compile 'com.google.android.gms:play-services-maps:10.2.6'
+    compile 'com.google.android.gms:play-services-location:10.2.6'
 
     testCompile 'junit:junit:4.12'
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {

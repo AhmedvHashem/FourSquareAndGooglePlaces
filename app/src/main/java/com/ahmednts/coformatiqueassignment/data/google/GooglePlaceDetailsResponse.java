@@ -10,4 +10,12 @@ public class GooglePlaceDetailsResponse {
 
     public GooglePlaceDetails result;
     public String status;
+
+    @Override
+    public String toString() {
+        return "GooglePlaceDetailsResponse{" +
+                "result=" + result +
+                ", status='" + status + '\'' +
+                '}';
+    }
 }

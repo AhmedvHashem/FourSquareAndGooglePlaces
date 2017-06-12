@@ -5,6 +5,9 @@ package com.ahmednts.coformatiqueassignment.data;
  */
 
 public class UnifiedPlaceDetails {
+
+    private ApiType apiType;
+
     private String id;
     private String name;
 
@@ -16,7 +19,15 @@ public class UnifiedPlaceDetails {
     private double lat;
     private double lng;
 
-    public UnifiedPlaceDetails(String id, String name, double rating, String address, String phone_number, double lat, double lng) {
+    private String category;
+
+    public static enum ApiType {
+        GOOGLE,
+        FOURESQUARE
+    }
+
+    public UnifiedPlaceDetails(ApiType apiType, String id, String name, double rating, String address, String phone_number, double lat, double lng, String category) {
+        this.apiType = apiType;
         this.id = id;
         this.name = name;
         this.rating = rating;
@@ -24,6 +35,11 @@ public class UnifiedPlaceDetails {
         this.phone_number = phone_number;
         this.lat = lat;
         this.lng = lng;
+        this.category = category;
+    }
+
+    public ApiType getApiType() {
+        return apiType;
     }
 
     public String getId() {
@@ -52,5 +68,23 @@ public class UnifiedPlaceDetails {
 
     public double getLng() {
         return lng;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    @Override
+    public String toString() {
+        return "UnifiedPlaceDetails{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", rating=" + rating +
+                ", address='" + address + '\'' +
+                ", phone_number='" + phone_number + '\'' +
+                ", lat=" + lat +
+                ", lng=" + lng +
+                ", category='" + category + '\'' +
+                '}';
     }
 }
